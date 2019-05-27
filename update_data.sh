@@ -7,6 +7,7 @@ scp z3486253@wrds-cloud.wharton.upenn.edu:/wrds/crsp/sasdata/a_stock/msi.sas7bda
 scp z3486253@wrds-cloud.wharton.upenn.edu:/wrds/crsp/sasdata/a_stock/dsi.sas7bdat .
 scp z3486253@wrds-cloud.wharton.upenn.edu:/wrds/comp/sasdata/naa/names.sas7bdat .
 scp z3486253@wrds-cloud.wharton.upenn.edu:/wrds/kld/sasdata/history.sas7bdat .
+scp z3486253@wrds-cloud.wharton.upenn.edu:/wrds/crsp/sasdata/a_stock/stocknames.sas7bdat .
 
 python3 update_data.py
 

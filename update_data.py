@@ -1,6 +1,24 @@
 import pandas as pd
 from glob import glob
 import numpy as np
+import gc
+
+stockname = pd.read_sas('stocknames.sas7bdat')
+print('Inflating stocknames')
+a_inf = []
+for permno, permco, namedt, nameenddt, cusip, ncusip, ticker, comnam, hexcd, exchcd,\
+         siccd, shrcd, shrcls, st_date, end_date,namedum in stockname.values:
+             d = namedt
+             while d<=nameenddt:
+                 a_inf.append([permno,permco,d,cusip,ncusip,ticker,comnam,hexcd,
+                     exchcd,siccd, shrcd, shrcls])
+                 d += np.timedelta64(1,'D')
+a_inf = pd.DataFrame(a_inf).drop_duplicates()
+a_inf.columns=['permno','permco','date','cusip','ncusip','ticker','comnam','hexcd',
+          'exchcd','siccd','shrcd','shrcls']
+a_inf.to_parquet('stockname_inflated.par')
+print('finished writing inflated stockname file')
+stockname.to_parquet('stockname.par')
 
 def get_fyear(df):
     if df.datadate.month > 6:
@@ -27,6 +45,10 @@ link_full.columns = ['gvkey','permno','date']
 link_full['gvkey'] = pd.to_numeric(link_full.gvkey)
 print(f'writing link table')
 link_full.to_parquet('ccm_linktable.par')
+
+print('collecting garbage to free up memory')
+del link_full
+gc.collect()
 
 print('process funda .... takes about 5 mins')
 
@@ -58,6 +80,12 @@ ccm.to_parquet('ccm.par')
 print(f'writing fundaccm, total {len(fundaccm)} obs')
 fundaccm.to_parquet('fundaccm.par')
 
+print('collecting garbage to free up memory')
+del funda
+del fundaccm
+del ccm
+gc.collect()
+
 print('process msf and dsf ... takes about 1 hour')
 msf = pd.read_sas('msf.sas7bdat',encoding='latin1')
 dsf = pd.read_sas('dsf.sas7bdat',encoding='latin1')
@@ -84,6 +112,11 @@ print(f'writing dsf_ccm, total {len(dsf_ccm)} obs')
 dsf_ccm.to_parquet('dsf_ccm.par')
 print(f'writing dsf, total {len(dsf)} obs')
 dsf.to_parquet('dsf.par')
+
+print('collecting garbage to free up memory')
+del dsf
+del msf
+gc.collect()
 
 # KLD data
 print('KLD data update')
